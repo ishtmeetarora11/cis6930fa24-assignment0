@@ -4,18 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pymupdf = "*"
-certifi = "*"
-pypdf = "*"
-setuptools = "*"
-pandas = "*"
-pytest = "*"
-"pdfminer.six" = "*"
-assignment0 = {file = ".", editable = true}
-pytest-mock = "*"
 requests = "*"
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.12.5"
