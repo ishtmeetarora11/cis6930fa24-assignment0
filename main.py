@@ -1,32 +1,64 @@
+import argparse
+import sys
+import json
 import requests
-import pprint
 
-def fetch_fbi_wanted_data(page=1):
-    url = f"https://api.fbi.gov/wanted/v1/list?page={page}"
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        data = response.json()
-        return data['items']
+
+def fetch_fbi_wanted_data(page):
+    response = requests.get('https://api.fbi.gov/wanted/v1/list', params={'page': page})
+    data = json.loads(response.content)
+    return data
+
+
+def load_data_from_file(file):
+    with open(file, 'r') as f:
+        return json.load(f)
+
+
+def extract_title(item):
+    title = item.get('title', '')
+    return item.get('title', '') if title else ''
+
+
+def extract_subjects(item):
+    subjects = item.get('subjects', [])
+    return ','.join(subjects) if subjects else ''
+
+
+def extract_field_offices(item):
+    field_offices = item.get('field_offices', [])
+    return ','.join(field_offices) if field_offices else ''
+
+
+def print_fbi_data(json_data):
+    for item in json_data['items']:
+        title = extract_title(item)
+        subjects_filtered = extract_subjects(item)
+        field_offices_filtered = extract_field_offices(item)
+        print(f"{title}þ{subjects_filtered}þ{field_offices_filtered}")
+
+
+def main(page=None, file=None):
+    if page is not None:
+        json_data = fetch_fbi_wanted_data(page)
+    elif file is not None:
+        json_data = load_data_from_file(file)
     else:
-        return None
+        return
 
-def extract_wanted_info(items):
-    extracted_data = []
-    for item in items:
-        title = item.get('title', '')
-        subjects = item.get('subjects', [])
-        field_offices = item.get('field_offices', [])
-        subjects_filtered = ','.join(subjects) if subjects!=None else ''
-        field_offices_filtered = ','.join(field_offices) if field_offices!=None else ''
-        extracted_data.append(f"{title}þ{subjects_filtered}þ{field_offices_filtered}")
-    return extracted_data
+    print_fbi_data(json_data)
 
-page_data = fetch_fbi_wanted_data(page=1)
-pprint.pprint(page_data[0])
-if page_data:
-    formatted_data = extract_wanted_info(page_data)
-    for entry in formatted_data:
-        print(entry)
-else:
-    print("Failed to fetch data")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", type=str, required=False, help="File location to read from specified")
+    parser.add_argument("--page", type=int, required=False, help="Page Specified")
+
+    args = parser.parse_args()
+
+    if args.page:
+        main(page=args.page)
+    elif args.file:
+        main(file=args.file)
+    else:
+        parser.print_help(sys.stderr)
