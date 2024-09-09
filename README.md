@@ -20,8 +20,6 @@ pipenv run python main.py --file <file-location>
 
 ## Functions
 
-main.py
-
 fetch_fbi_wanted_data(page): Fetches data from the FBI API for a given page number.
 
 load_data_from_file(file): Loads and returns data from a specified local JSON file.
