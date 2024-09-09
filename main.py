@@ -6,7 +6,6 @@ import requests
 def fetch_fbi_wanted_data(page):
     # Fetches data from the FBI's Wanted API for a specific page number.
     response = requests.get('https://api.fbi.gov/wanted/v1/list', params={'page': page})
-    # Converts the response content from JSON string to Python dictionary.
     data = json.loads(response.content)
     return data
 
@@ -50,7 +49,6 @@ def main(page=None, file=None):
         # Load data from file if provided.
         json_data = load_data_from_file(file)
     else:
-        # Exit if neither page nor file is specified.
         return
 
     # Print the fetched or loaded data.
@@ -70,5 +68,4 @@ if __name__ == '__main__':
     elif args.file:
         main(file=args.file)
     else:
-        # Print help if no arguments are provided.
         parser.print_help(sys.stderr)
